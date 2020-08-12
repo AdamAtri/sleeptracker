@@ -34,7 +34,7 @@ abstract class SleepDatabase : RoomDatabase() {
   companion object {
     @Volatile
     private var INSTANCE: SleepDatabase? = null
-
+    @JvmStatic
     fun getInstance(context: Context): SleepDatabase {
       synchronized(this) {
         var instance = INSTANCE

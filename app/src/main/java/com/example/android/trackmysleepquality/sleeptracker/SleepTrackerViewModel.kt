@@ -18,13 +18,86 @@ package com.example.android.trackmysleepquality.sleeptracker
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
 import com.example.android.trackmysleepquality.database.SleepDatabaseDao
+import com.example.android.trackmysleepquality.database.SleepNight
+import kotlinx.coroutines.*
 
 /**
  * ViewModel for SleepTrackerFragment.
  */
-class SleepTrackerViewModel(
-        val database: SleepDatabaseDao,
-        application: Application) : AndroidViewModel(application) {
+class SleepTrackerViewModel(val database: SleepDatabaseDao, application: Application) : AndroidViewModel(application) {
+
+  private var viewModelJob = Job()
+
+  override fun onCleared() {
+    super.onCleared()
+    viewModelJob.cancel()
+  }
+
+  // provide scope for the coroutine to run in
+  private val jobScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+  private var tonight = MutableLiveData<SleepNight?>()
+  private val nights = database.getAllNights()
+
+  init {
+    initializeTonight()
+  }
+
+  private fun initializeTonight() {
+    jobScope.launch {
+      tonight.value = getTonight()
+    }
+  }
+
+  private suspend fun getTonight(): SleepNight? {
+    return withContext(Dispatchers.IO) {
+      var night = database.getTonight()
+      if (night?.endTimeMillis == night?.startTimeMillis)
+        night = null
+      night
+    }
+  }
+
+  fun onStartTracking() {
+    jobScope.launch {
+      val newNight = SleepNight()
+      insert(newNight)
+      tonight.value = getTonight()
+    }
+  }
+
+  private suspend fun insert(night:SleepNight) {
+    withContext(Dispatchers.IO) {
+      database.insert(night)
+    }
+  }
+
+  fun onStopTracking() {
+    jobScope.launch {
+      val oldNight = tonight.value ?: return@launch
+      oldNight.endTimeMillis = System.currentTimeMillis()
+      update(oldNight)
+    }
+  }
+
+  private suspend fun update(night:SleepNight) {
+    withContext(Dispatchers.IO) {
+      database.update(night)
+    }
+  }
+
+  fun onClear() {
+    jobScope.launch {
+      clear()
+    }
+  }
+
+  private suspend fun clear() {
+    withContext(Dispatchers.IO) {
+      database.clear()
+    }
+  }
+
 }
 
