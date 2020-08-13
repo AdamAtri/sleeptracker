@@ -105,6 +105,7 @@ class SleepTrackerViewModel(val database: SleepDatabaseDao, application: Applica
   fun onClear() {
     jobScope.launch {
       clear()
+      _showSnackEvent.value = true;
     }
   }
 
@@ -114,5 +115,22 @@ class SleepTrackerViewModel(val database: SleepDatabaseDao, application: Applica
     }
   }
 
+  val startButtonVisible = Transformations.map(tonight) {
+    it == null
+  }
+  val stopButtonVisible = Transformations.map(tonight) {
+    it != null
+  }
+  val clearButtonVisible = Transformations.map(nights) {
+    it?.isNotEmpty()
+  }
+
+  private var _showSnackEvent = MutableLiveData<Boolean>()
+  val showSnackEvent: LiveData<Boolean>
+    get() = _showSnackEvent
+
+  fun doneShowingSnack() {
+    _showSnackEvent.value = false
+  }
 }
 
