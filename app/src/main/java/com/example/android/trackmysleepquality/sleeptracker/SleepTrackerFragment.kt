@@ -17,12 +17,15 @@
 package com.example.android.trackmysleepquality.sleeptracker
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import com.example.android.trackmysleepquality.R
 import com.example.android.trackmysleepquality.database.SleepDatabase
 import com.example.android.trackmysleepquality.databinding.FragmentSleepTrackerBinding
@@ -48,12 +51,23 @@ class SleepTrackerFragment : Fragment() {
 
         val application = requireNotNull(this.activity).application
         val dataSource = SleepDatabase.getInstance(application).sleepDatabaseDao
-        val trackerModelFactor = SleepTrackerViewModelFactory(dataSource, application)
+        val trackerModelFactory = SleepTrackerViewModelFactory(dataSource, application)
         val sleepTrackerModel =
-          ViewModelProviders.of(this, trackerModelFactor).get(SleepTrackerViewModel::class.java)
+          ViewModelProviders.of(this, trackerModelFactory).get(SleepTrackerViewModel::class.java)
 
         binding.sleepTrackerModel = sleepTrackerModel
         binding.setLifecycleOwner(this)
+
+        sleepTrackerModel.navToQualityEvent.observe(this, Observer { night ->
+            night?.let {
+                this.findNavController().navigate(
+                  SleepTrackerFragmentDirections.actionSleepTrackerFragmentToSleepQualityFragment(night.nightId)
+                )
+                sleepTrackerModel.doneNavigating()
+            }
+        })
+
+
 
         return binding.root
     }
