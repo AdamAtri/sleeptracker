@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.android.trackmysleepquality.database.SleepNight
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.min
 
 /**
  * These functions create a formatted string that can be set in a TextView.
@@ -105,6 +106,17 @@ fun formatNights(nights: List<SleepNight>, resources: Resources): Spanned {
     } else {
         return HtmlCompat.fromHtml(sb.toString(), HtmlCompat.FROM_HTML_MODE_LEGACY)
     }
+}
+
+fun formatMillisForDuration(start:Long, finish:Long): String {
+    val millis = finish - start;
+    var minutes = millis / 1000 / 60
+    val seconds = millis / 1000 % 60
+
+    var hours = minutes % 60
+    minutes -= hours * 60
+
+    return "${if (hours < 10) "0" else ""}${hours}:${if (minutes < 10) "0" else ""}${minutes}:${if (seconds < 10) "0" else ""}${seconds}"
 }
 
 /**
