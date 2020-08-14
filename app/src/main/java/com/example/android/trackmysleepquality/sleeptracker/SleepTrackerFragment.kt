@@ -62,7 +62,7 @@ class SleepTrackerFragment : Fragment() {
         binding.sleepList.adapter = adapter
 
         sleepTrackerModel.nights.observe(viewLifecycleOwner, Observer { nights ->
-            adapter.data = nights
+            adapter.submitList(nights)
         })
 
         sleepTrackerModel.navToQualityEvent.observe(this, Observer { night ->
