@@ -17,9 +17,12 @@
 package com.example.android.trackmysleepquality.sleeptracker
 
 import android.os.Bundle
+import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -61,7 +64,12 @@ class SleepTrackerFragment : Fragment() {
         binding.setLifecycleOwner(this)
 
         // create a SleepNight list-adapter and attach to the binding
-        val adapter = SleepNightAdapter()
+        val adapter = SleepNightAdapter(SleepNightListener { sleepId ->
+            // TODO: do something with the sleepId
+            val t = Toast.makeText(application.applicationContext, "SleepId:$sleepId", Toast.LENGTH_SHORT)
+            t.setGravity(Gravity.RIGHT or Gravity.TOP, 8, 72)
+            t.show()
+        })
         binding.sleepList.adapter = adapter
 
         // create a GridLayoutManger and attach to the binding
