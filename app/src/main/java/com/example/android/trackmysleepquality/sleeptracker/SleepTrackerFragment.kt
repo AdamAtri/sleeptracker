@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.android.trackmysleepquality.R
 import com.example.android.trackmysleepquality.database.SleepDatabase
 import com.example.android.trackmysleepquality.databinding.FragmentSleepTrackerBinding
@@ -55,18 +56,35 @@ class SleepTrackerFragment : Fragment() {
         val sleepTrackerModel =
           ViewModelProviders.of(this, trackerModelFactory).get(SleepTrackerViewModel::class.java)
 
+        // attach the model to the binding
         binding.sleepTrackerModel = sleepTrackerModel
         binding.setLifecycleOwner(this)
 
+        // create a SleepNight list-adapter and attach to the binding
         val adapter = SleepNightAdapter()
         binding.sleepList.adapter = adapter
 
+        // create a GridLayoutManger and attach to the binding
+        // columns = 3
+        val manager = GridLayoutManager(activity, 3)
+        binding.sleepList.layoutManager = manager
+
+        // add observers
+        addModelObservers(sleepTrackerModel, adapter)
+
+        // return the binding's root view
+        return binding.root
+    }
+
+    /**
+     * add observers to the sleepTrackerModel
+    */
+    private fun addModelObservers(sleepTrackerModel: SleepTrackerViewModel, adapter: SleepNightAdapter) {
         sleepTrackerModel.nights.observe(viewLifecycleOwner, Observer { nights ->
             adapter.submitList(nights)
         })
-
         sleepTrackerModel.navToQualityEvent.observe(this, Observer { night ->
-            // <var>?.let{ } === whenNotNull(it:<VarClass> -> {...})
+            // ---> <var>?.let{ } === whenNotNull(it:<VarClass> -> {...}) // (Elvis-operator and let)
             night?.let {
                 this.findNavController().navigate(
                   SleepTrackerFragmentDirections.actionSleepTrackerFragmentToSleepQualityFragment(night.nightId)
@@ -74,7 +92,6 @@ class SleepTrackerFragment : Fragment() {
                 sleepTrackerModel.doneNavigating()
             }
         })
-
         sleepTrackerModel.showSnackEvent.observe(this, Observer { event ->
             event?.let {
                 if (it) {
@@ -87,8 +104,5 @@ class SleepTrackerFragment : Fragment() {
                 }
             }
         })
-
-
-        return binding.root
     }
 }
