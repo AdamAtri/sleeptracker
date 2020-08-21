@@ -133,5 +133,17 @@ class SleepTrackerViewModel(val database: SleepDatabaseDao, application: Applica
   fun doneShowingSnack() {
     _showSnackEvent.value = false
   }
+
+  private val _navToDetailEvent = MutableLiveData<Long>()
+  val navToDetailEvent: LiveData<Long>
+    get() = _navToDetailEvent
+
+  fun showDetailForId(sleepId:Long) {
+    _navToDetailEvent.value = sleepId
+  }
+
+  fun doneNavigatingToDetail() {
+    _navToDetailEvent.value = -1
+  }
 }
 
