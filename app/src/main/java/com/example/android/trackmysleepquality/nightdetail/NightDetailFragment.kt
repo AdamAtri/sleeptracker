@@ -8,6 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.example.android.trackmysleepquality.R
 import com.example.android.trackmysleepquality.database.SleepDatabase
 import com.example.android.trackmysleepquality.database.SleepNight
@@ -30,6 +32,15 @@ class NightDetailFragment : Fragment() {
     val dao = SleepDatabase.getInstance(application.applicationContext).sleepDatabaseDao
     val factory = NightDetailViewModelFactory(dao, args.sleepNightKey)
     val model = ViewModelProviders.of(this, factory).get(NightDetailViewModel::class.java)
+
+    model.navigateBackEvent.observe(this, Observer { navBack ->
+      if (navBack) {
+        this.findNavController().navigate(
+          NightDetailFragmentDirections.actionNightDetailFragmentToSleepTrackerFragment()
+        )
+        model.clearNavigation()
+      }
+    })
 
     binding.viewModel = model
 

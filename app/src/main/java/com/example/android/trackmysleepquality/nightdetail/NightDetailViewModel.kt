@@ -41,4 +41,15 @@ class NightDetailViewModel(
     }
   }
 
+  private val _navigateBackEvent = MutableLiveData<Boolean>()
+  val navigateBackEvent:LiveData<Boolean>
+    get() = _navigateBackEvent
+
+  fun navBack() {
+    _navigateBackEvent.value = true
+  }
+
+  fun clearNavigation() {
+    _navigateBackEvent.value = false
+  }
 }
