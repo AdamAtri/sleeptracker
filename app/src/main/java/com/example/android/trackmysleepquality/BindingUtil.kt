@@ -1,12 +1,9 @@
-package com.example.android.trackmysleepquality.utils
+package com.example.android.trackmysleepquality
 
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import com.example.android.trackmysleepquality.R
-import com.example.android.trackmysleepquality.convertNumericQualityToString
 import com.example.android.trackmysleepquality.database.SleepNight
-import com.example.android.trackmysleepquality.formatMillisForDuration
 
 @BindingAdapter("sleepLength")
 fun TextView.setSleepLength(item: SleepNight?) {
